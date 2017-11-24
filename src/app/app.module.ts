@@ -1,40 +1,62 @@
-import { NgModule, ErrorHandler } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
-import { MyApp } from './app.component';
+import { NgModule, ErrorHandler } from "@angular/core";
+import { BrowserModule } from "@angular/platform-browser";
+import { HttpClientModule } from "@angular/common/http";
 
-import { AboutPage } from '../pages/about/about';
-import { ContactPage } from '../pages/contact/contact';
-import { HomePage } from '../pages/home/home';
-import { TabsPage } from '../pages/tabs/tabs';
+import { IonicApp, IonicModule, IonicErrorHandler } from "ionic-angular";
 
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
+import { StatusBar } from "@ionic-native/status-bar";
+import { SplashScreen } from "@ionic-native/splash-screen";
+
+import { AppComponent } from "./app.component";
+
+// pages
+import { AboutPage } from "../pages/about/about";
+import { TodosPage } from "../pages/todos/todos";
+import { HomePage } from "../pages/home/home";
+import { TabsPage } from "../pages/tabs/tabs";
+
+// store
+import { StoreModule } from "@ngrx/store";
+import { storeFreeze } from "ngrx-store-freeze";
+import { INITIAL_STATE } from "../store/state/app-state";
+import { storeReducer } from "../store/reducers/store-reducer";
+
+// components
+import { TodosComponent } from "../containers/todos/todos.component";
+
+// services
+import { TodosService } from "../containers/todos/todos.service";
+
+// rxjs imports
+import "rxjs/add/operator/map";
+import "rxjs/add/operator/do";
+import "rxjs/add/operator/filter";
+import "rxjs/add/operator/skip";
+import "rxjs/add/operator/take";
+import "rxjs/add/observable/interval";
+import "rxjs/add/operator/toPromise";
+import "rxjs/add/operator/combineLatest";
+import "rxjs/add/operator/takeWhile";
+
+export const metaReducers = [storeFreeze];
 
 @NgModule({
-  declarations: [
-    MyApp,
-    AboutPage,
-    ContactPage,
-    HomePage,
-    TabsPage
-  ],
+  declarations: [AppComponent, AboutPage, TodosPage, HomePage, TabsPage, TodosComponent],
   imports: [
     BrowserModule,
-    IonicModule.forRoot(MyApp)
+    HttpClientModule,
+    IonicModule.forRoot(AppComponent),
+    StoreModule.forRoot(
+      {},
+      {
+        reducerFactory: () => storeReducer,
+        metaReducers,
+        initialState: INITIAL_STATE
+      }
+    )
   ],
   bootstrap: [IonicApp],
-  entryComponents: [
-    MyApp,
-    AboutPage,
-    ContactPage,
-    HomePage,
-    TabsPage
-  ],
-  providers: [
-    StatusBar,
-    SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
-  ]
+  entryComponents: [AppComponent, AboutPage, TodosPage, HomePage, TabsPage],
+  providers: [StatusBar, SplashScreen, { provide: ErrorHandler, useClass: IonicErrorHandler }, TodosService]
 })
 export class AppModule {}
