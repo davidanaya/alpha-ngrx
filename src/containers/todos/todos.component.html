@@ -1,4 +1,31 @@
-<ion-list>
-  <ion-list-header>List of todos</ion-list-header>
-  <pre>{{ todos$ | async | json }}</pre>
-</ion-list>
+<ng-container *ngIf="loaded; else loading">
+
+  <ion-list no-lines *ngIf="todos.length; else noTodos">
+    <ion-item *ngFor="let todo of todos">
+      <ion-icon [ngClass]="todo.complete ? 'done' : 'undone'" [name]="todo.complete ? 'checkmark' : 'close'" item-start>
+      </ion-icon>
+      {{ todo.text }}
+    </ion-item>
+  </ion-list>
+
+  <ng-template #noTodos>
+    There are no todos at the moment
+  </ng-template>
+
+  <ion-footer>
+    <ion-toolbar>
+      <button ion-button outline small (click)="addTodo()">
+        Add todo
+      </button>
+
+      <button ion-button outline small (click)="clearTodos()">
+        Clear todos
+      </button>
+    </ion-toolbar>
+  </ion-footer>
+
+</ng-container>
+
+<ng-template #loading>
+  <ion-spinner></ion-spinner>
+</ng-template>

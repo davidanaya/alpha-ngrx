@@ -3,6 +3,8 @@ import { HttpClient } from "@angular/common/http";
 
 import { Observable } from "rxjs/Observable";
 
+import { StorageService } from "../../services/storage.service";
+
 export interface Todo {
   id: number;
   text: string;
@@ -11,14 +13,28 @@ export interface Todo {
 
 @Injectable()
 export class TodosService {
-  public todos$: Observable<Todo[]>;
+  constructor(private http: HttpClient, private storageService: StorageService) {}
 
-  constructor(private http: HttpClient) {
-    this.todos$ = this.http.get<any>(`assets/db/todos.json`).map(todos => this.todoToViewModel(todos));
+  loadTodos(): Observable<Todo[]> {
+    return Observable.fromPromise(this.storageService.loadTodos()).mergeMap((todos: Todo[]) => {
+      if (todos) {
+        return Observable.of(todos);
+      }
+      console.log("No todos in storage, loading from http...");
+      return this.http
+        .get<any>(`assets/db/todos.json`)
+        .delay(2000)
+        .map(todos => this.todoToViewModel(todos));
+    });
+  }
+
+  saveTodos(todos: Todo[]) {
+    this.storageService.saveTodos(todos);
   }
 
   private todoToViewModel(todos: any[]): Todo[] {
-    console.log(todos);
-    return todos.map(todo => Object.assign({}, { id: todo.id, text: todo.description, complete: todo.complete }));
+    return todos.map(todo =>
+      Object.assign({}, { id: todo.id, text: todo.description, complete: todo.complete })
+    );
   }
 }

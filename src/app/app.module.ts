@@ -3,7 +3,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { HttpClientModule } from "@angular/common/http";
 
 import { IonicApp, IonicModule, IonicErrorHandler } from "ionic-angular";
-
+import { IonicStorageModule } from "@ionic/storage";
 import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 
@@ -26,6 +26,7 @@ import { TodosComponent } from "../containers/todos/todos.component";
 
 // services
 import { TodosService } from "../containers/todos/todos.service";
+import { StorageService } from "../services/storage.service";
 
 // rxjs imports
 import "rxjs/add/operator/map";
@@ -33,10 +34,11 @@ import "rxjs/add/operator/do";
 import "rxjs/add/operator/filter";
 import "rxjs/add/operator/skip";
 import "rxjs/add/operator/take";
-import "rxjs/add/observable/interval";
-import "rxjs/add/operator/toPromise";
-import "rxjs/add/operator/combineLatest";
-import "rxjs/add/operator/takeWhile";
+import "rxjs/add/operator/delay";
+import 'rxjs/add/observable/fromPromise';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/mergeMap';
 
 export const metaReducers = [storeFreeze];
 
@@ -46,6 +48,7 @@ export const metaReducers = [storeFreeze];
     BrowserModule,
     HttpClientModule,
     IonicModule.forRoot(AppComponent),
+    IonicStorageModule.forRoot(),
     StoreModule.forRoot(
       {},
       {
@@ -57,6 +60,12 @@ export const metaReducers = [storeFreeze];
   ],
   bootstrap: [IonicApp],
   entryComponents: [AppComponent, AboutPage, TodosPage, HomePage, TabsPage],
-  providers: [StatusBar, SplashScreen, { provide: ErrorHandler, useClass: IonicErrorHandler }, TodosService]
+  providers: [
+    StatusBar,
+    SplashScreen,
+    { provide: ErrorHandler, useClass: IonicErrorHandler },
+    TodosService,
+    StorageService
+  ]
 })
 export class AppModule {}
