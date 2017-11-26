@@ -4,6 +4,7 @@ import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs/Observable";
 
 import { StorageService } from "../../services/storage.service";
+import { BehaviorSubject } from "rxjs/BehaviorSubject";
 
 export interface Todo {
   id: number;
@@ -13,9 +14,34 @@ export interface Todo {
 
 @Injectable()
 export class TodosService {
-  constructor(private http: HttpClient, private storageService: StorageService) {}
+  public todos$: Observable<Todo[]>;
+  private todos: Todo[];
+  private subject = new BehaviorSubject<Todo[]>(undefined);
 
-  loadTodos(): Observable<Todo[]> {
+  constructor(private http: HttpClient, private storageService: StorageService) {
+    this.todos$ = this.subject.asObservable();
+
+    this.loadTodos().subscribe(todos => {
+      this.todos = todos;
+      this.subject.next(this.todos);
+    });
+  }
+
+  addTodo(newTodo: Todo) {
+    const maxIndexInTodos = this.todos.length ? this.todos.reduce((a, b) => (a > b.id ? a : b.id), 0) : 0;
+    newTodo.id = maxIndexInTodos + 1;
+    this.todos = [...this.todos, newTodo];
+    this.subject.next(this.todos);
+    this.saveTodos(this.todos);
+  }
+
+  clearTodos() {
+    this.todos = [];
+    this.subject.next(this.todos);
+    this.saveTodos(this.todos);
+  }
+
+  private loadTodos(): Observable<Todo[]> {
     return Observable.fromPromise(this.storageService.loadTodos()).mergeMap((todos: Todo[]) => {
       if (todos) {
         return Observable.of(todos);
@@ -28,7 +54,7 @@ export class TodosService {
     });
   }
 
-  saveTodos(todos: Todo[]) {
+  private saveTodos(todos: Todo[]) {
     this.storageService.saveTodos(todos);
   }
 

@@ -1,4 +1,4 @@
-<ng-container *ngIf="loaded; else loading">
+<ng-container *ngIf="todos$ | async as todos; else loading">
 
   <ion-list no-lines *ngIf="todos.length; else noTodos">
     <ion-item *ngFor="let todo of todos">
