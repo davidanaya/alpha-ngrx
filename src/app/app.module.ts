@@ -41,7 +41,9 @@ import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/mergeMap';
 
-export const metaReducers = [storeFreeze];
+// store freeze should only be used in development
+// export const metaReducers: MetaReducer<State>[] = !environment.production ? [storeFreeze]: [];
+export const metaReducers = [];
 
 @NgModule({
   declarations: [AppComponent, AboutPage, TodosPage, HomePage, TabsPage, TodosComponent],
@@ -71,7 +73,7 @@ export const metaReducers = [storeFreeze];
     {
       provide: APP_INITIALIZER,
       useFactory: () => () => {},
-      deps: [TodosService],
+      deps: [TodosService, StorageService],
       multi: true
     },
   ]

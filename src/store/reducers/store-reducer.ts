@@ -6,12 +6,16 @@ import {
   TODO_ADDED_ACTION,
   TodoAddedAction,
   TODOS_CLEARED_ACTION,
-  TodosClearedAction
+  TodosClearedAction,
+  PLATFORM_READY_ACTION,
+  PlatformReadyAction
 } from "../actions/todo-actions";
 import { AppState, INITIAL_STATE } from "../state/app-state";
 
 export function storeReducer(state: AppState = INITIAL_STATE, action: Action): AppState {
   switch (action.type) {
+    case PLATFORM_READY_ACTION:
+      return handlePlatformReadyAction(state, <any>action);
     case TODOS_LOADED_ACTION:
       return handleTodosLoadedAction(state, <any>action);
     case TODO_ADDED_ACTION:
@@ -23,6 +27,12 @@ export function storeReducer(state: AppState = INITIAL_STATE, action: Action): A
   }
 }
 
+function handlePlatformReadyAction(state: AppState, action: PlatformReadyAction): AppState {
+  const newState: AppState = { ...state };
+  newState.platformReady = true;
+  return newState;
+}
+
 function handleTodosLoadedAction(state: AppState, action: TodosLoadedAction): AppState {
   const todos = action.payload;
   const newState: AppState = { ...state, todos };
@@ -31,7 +41,10 @@ function handleTodosLoadedAction(state: AppState, action: TodosLoadedAction): Ap
 
 function handleTodoAddedAction(state: AppState, action: TodoAddedAction): AppState {
   const todo = action.payload;
-  console.log("newtodos: ", [...state.todos, todo]);
+  if (!todo.id) {
+    const maxIndexInTodos = state.todos.length ? state.todos.reduce((a, b) => (a > b.id ? a : b.id), 0) : 0;
+    todo.id = maxIndexInTodos + 1;
+  }
   const newState: AppState = { ...state, todos: [...state.todos, todo] };
   return newState;
 }
