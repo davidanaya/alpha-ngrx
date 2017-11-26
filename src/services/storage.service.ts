@@ -7,7 +7,7 @@ export class StorageService {
   constructor(private storage: Storage) {
   }
 
-  async loadTodos(): Promise<Todos[]> {
+  async loadTodos(): Promise<Todo[]> {
     let todos;
     try {
       todos = await this.storage.get("todos");
