@@ -1,4 +1,4 @@
-import { NgModule, ErrorHandler } from "@angular/core";
+import { NgModule, ErrorHandler, APP_INITIALIZER } from "@angular/core";
 import { BrowserModule } from "@angular/platform-browser";
 import { HttpClientModule } from "@angular/common/http";
 
@@ -20,6 +20,7 @@ import { StoreModule } from "@ngrx/store";
 import { storeFreeze } from "ngrx-store-freeze";
 import { INITIAL_STATE } from "../store/state/app-state";
 import { storeReducer } from "../store/reducers/store-reducer";
+import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 
 // components
 import { TodosComponent } from "../containers/todos/todos.component";
@@ -56,7 +57,8 @@ export const metaReducers = [storeFreeze];
         metaReducers,
         initialState: INITIAL_STATE
       }
-    )
+    ),
+    StoreDevtoolsModule.instrument({ maxAge: 25 })
   ],
   bootstrap: [IonicApp],
   entryComponents: [AppComponent, AboutPage, TodosPage, HomePage, TabsPage],
@@ -65,7 +67,13 @@ export const metaReducers = [storeFreeze];
     SplashScreen,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
     TodosService,
-    StorageService
+    StorageService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => () => {},
+      deps: [TodosService],
+      multi: true
+    },
   ]
 })
 export class AppModule {}

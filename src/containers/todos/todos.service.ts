@@ -4,7 +4,9 @@ import { HttpClient } from "@angular/common/http";
 import { Observable } from "rxjs/Observable";
 
 import { StorageService } from "../../services/storage.service";
-import { BehaviorSubject } from "rxjs/BehaviorSubject";
+import { AppState } from "../../store/state/app-state";
+import { Store } from "@ngrx/store";
+import { TodosLoadedAction } from "../../store/actions/todo-actions";
 
 export interface Todo {
   id: number;
@@ -14,31 +16,31 @@ export interface Todo {
 
 @Injectable()
 export class TodosService {
-  public todos$: Observable<Todo[]>;
   private todos: Todo[];
-  private subject = new BehaviorSubject<Todo[]>(undefined);
 
-  constructor(private http: HttpClient, private storageService: StorageService) {
-    this.todos$ = this.subject.asObservable();
-
+  constructor(
+    private http: HttpClient,
+    private storageService: StorageService,
+    private store: Store<AppState>
+  ) {
     this.loadTodos().subscribe(todos => {
       this.todos = todos;
-      this.subject.next(this.todos);
+      this.store.dispatch(new TodosLoadedAction(this.todos));
     });
   }
 
   addTodo(newTodo: Todo) {
-    const maxIndexInTodos = this.todos.length ? this.todos.reduce((a, b) => (a > b.id ? a : b.id), 0) : 0;
-    newTodo.id = maxIndexInTodos + 1;
-    this.todos = [...this.todos, newTodo];
-    this.subject.next(this.todos);
-    this.saveTodos(this.todos);
+    // const maxIndexInTodos = this.todos.length ? this.todos.reduce((a, b) => (a > b.id ? a : b.id), 0) : 0;
+    // newTodo.id = maxIndexInTodos + 1;
+    // this.todos = [...this.todos, newTodo];
+    // this.subject.next(this.todos);
+    // this.saveTodos(this.todos);
   }
 
   clearTodos() {
-    this.todos = [];
-    this.subject.next(this.todos);
-    this.saveTodos(this.todos);
+    // this.todos = [];
+    // this.subject.next(this.todos);
+    // this.saveTodos(this.todos);
   }
 
   private loadTodos(): Observable<Todo[]> {

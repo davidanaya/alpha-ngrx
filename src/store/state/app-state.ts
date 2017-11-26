@@ -5,5 +5,5 @@ export interface AppState {
 }
 
 export const INITIAL_STATE: AppState = {
-  todos: []
+  todos: undefined
 };
