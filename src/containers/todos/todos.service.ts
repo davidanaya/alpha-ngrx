@@ -6,6 +6,7 @@ import { Observable } from "rxjs/Observable";
 import { AppState } from "../../store/state/app-state";
 import { Store } from "@ngrx/store";
 import { TodosLoadedAction } from "../../store/actions/todo-actions";
+import { StorageService } from "../../services/storage.service";
 
 export class Todo {
   id: number;
@@ -15,17 +16,23 @@ export class Todo {
 
 @Injectable()
 export class TodosService {
-  constructor(private http: HttpClient, private store: Store<AppState>) {
+  constructor(
+    private http: HttpClient,
+    private store: Store<AppState>,
+    private storageService: StorageService
+  ) {
     this.store
-      .select(state => state.todos)
-      .skip(1) // skip store initializer, could also use skipUntil or any other merge/filter operator
-      .take(1) // we only want load from http once
-      .filter(todos => !todos)
-      .subscribe(todos =>
-        this.loadTodos().subscribe(todos => {
+      .select(state => state.platformReady)
+      .filter(platformReady => !!platformReady)
+      .take(1) // we only want to subscribe once
+      .subscribe(async () => {
+        const todos = await this.storageService.loadTodos();
+        if (!todos) {
+          this.loadTodos().subscribe(todos => this.store.dispatch(new TodosLoadedAction(todos)));
+        } else {
           this.store.dispatch(new TodosLoadedAction(todos));
-        })
-      );
+        }
+      });
   }
 
   private loadTodos(): Observable<Todo[]> {

@@ -8,17 +8,7 @@ import { TodosLoadedAction } from "../store/actions/todo-actions";
 @Injectable()
 export class StorageService {
   constructor(private storage: Storage, private store: Store<AppState>) {
-    this.store
-      .select(state => state.platformReady)
-      .filter(platformReady => !!platformReady)
-      .take(1) // we only want to subscribe once
-      .subscribe(async () => {
-        const todos = await this.loadTodos();
-        this.store.dispatch(new TodosLoadedAction(todos));
-
-        // we only subscribe after first load, so we don´t save what we just loaded
-        this.store.select(state => state.todos).subscribe(todos => this.saveTodos(todos));
-      });
+    this.store.select(state => state.todos).subscribe(todos => this.saveTodos(todos));
   }
 
   async loadTodos(): Promise<Todo[]> {

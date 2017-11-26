@@ -27,6 +27,4 @@ export class TodoAddedAction implements Action {
 
 export class TodosClearedAction implements Action {
   readonly type = TODOS_CLEARED_ACTION;
-
-  constructor() {}
 }
