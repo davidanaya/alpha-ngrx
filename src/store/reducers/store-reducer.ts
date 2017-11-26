@@ -41,9 +41,10 @@ function handleTodosLoadedAction(state: AppState, action: TodosLoadedAction): Ap
 
 function handleTodoAddedAction(state: AppState, action: TodoAddedAction): AppState {
   const todo = action.payload;
+  let newTodo;
   if (!todo.id) {
     const maxIndexInTodos = state.todos.length ? state.todos.reduce((a, b) => (a > b.id ? a : b.id), 0) : 0;
-    todo.id = maxIndexInTodos + 1;
+    newTodo = { ...todo, id: maxIndexInTodos + 1 };
   }
   const newState: AppState = { ...state, todos: [...state.todos, todo] };
   return newState;
