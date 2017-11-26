@@ -21,6 +21,8 @@ import { storeFreeze } from "ngrx-store-freeze";
 import { INITIAL_STATE } from "../store/state/app-state";
 import { storeReducer } from "../store/reducers/store-reducer";
 import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+import { EffectsModule } from "@ngrx/effects";
+import { LoadTodosEffectService } from "../store/effects/load-todos-effect.service";
 
 // components
 import { TodosComponent } from "../containers/todos/todos.component";
@@ -39,7 +41,7 @@ import "rxjs/add/operator/delay";
 import 'rxjs/add/observable/fromPromise';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/switchMap';
 
 // store freeze should only be used in development
 export const metaReducers = [storeFreeze];
@@ -59,6 +61,7 @@ export const metaReducers = [storeFreeze];
         initialState: INITIAL_STATE
       }
     ),
+    EffectsModule.forRoot([LoadTodosEffectService]),
     StoreDevtoolsModule.instrument({ maxAge: 25 })
   ],
   bootstrap: [IonicApp],

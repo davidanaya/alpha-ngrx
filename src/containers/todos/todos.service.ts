@@ -5,7 +5,7 @@ import { Observable } from "rxjs/Observable";
 
 import { AppState } from "../../store/state/app-state";
 import { Store } from "@ngrx/store";
-import { TodosLoadedAction } from "../../store/actions/todo-actions";
+import { TodosLoadedAction, LoadTodosAction } from "../../store/actions/todo-actions";
 import { StorageService } from "../../services/storage.service";
 
 export class Todo {
@@ -28,14 +28,14 @@ export class TodosService {
       .subscribe(async () => {
         const todos = await this.storageService.loadTodos();
         if (!todos) {
-          this.loadTodos().subscribe(todos => this.store.dispatch(new TodosLoadedAction(todos)));
+          this.store.dispatch(new LoadTodosAction());
         } else {
           this.store.dispatch(new TodosLoadedAction(todos));
         }
       });
   }
 
-  private loadTodos(): Observable<Todo[]> {
+  loadTodos(): Observable<Todo[]> {
     return this.http
       .get<any>(`assets/db/todos.json`)
       .delay(2000)
