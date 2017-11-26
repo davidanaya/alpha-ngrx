@@ -13,18 +13,18 @@ import { AppState } from "../../store/state/app-state";
 export class TodosComponent implements OnInit {
   private todos$: Observable<Todo[]>;
 
-  constructor(private store: Store<AppState>) {}
+  constructor(private store: Store<AppState>, private todosService: TodosService) {}
 
   ngOnInit() {
     this.todos$ = this.store.select(state => state.todos);
   }
 
   addTodo() {
-    // const newTodo = { id: null, text: `todo`, complete: false };
-    // this.todosService.addTodo(newTodo);
+    const newTodo = { id: null, text: `todo`, complete: false };
+    this.todosService.addTodo(newTodo);
   }
 
   clearTodos() {
-    // this.todosService.clearTodos();
+    this.todosService.clearTodos();
   }
 }

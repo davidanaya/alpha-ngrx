@@ -6,7 +6,7 @@ import { Observable } from "rxjs/Observable";
 import { StorageService } from "../../services/storage.service";
 import { AppState } from "../../store/state/app-state";
 import { Store } from "@ngrx/store";
-import { TodosLoadedAction } from "../../store/actions/todo-actions";
+import { TodosLoadedAction, TodoAddedAction, TodosClearedAction } from "../../store/actions/todo-actions";
 
 export interface Todo {
   id: number;
@@ -23,24 +23,27 @@ export class TodosService {
     private storageService: StorageService,
     private store: Store<AppState>
   ) {
-    this.loadTodos().subscribe(todos => {
-      this.todos = todos;
-      this.store.dispatch(new TodosLoadedAction(this.todos));
-    });
+    this.loadTodos()
+      .take(1)
+      .subscribe(todos => {
+        this.todos = todos;
+        this.store.dispatch(new TodosLoadedAction(this.todos));
+
+        this.store.select(state => state.todos).subscribe(todos => {
+          this.todos = todos;
+          this.storageService.saveTodos(todos);
+        });
+      });
   }
 
   addTodo(newTodo: Todo) {
-    // const maxIndexInTodos = this.todos.length ? this.todos.reduce((a, b) => (a > b.id ? a : b.id), 0) : 0;
-    // newTodo.id = maxIndexInTodos + 1;
-    // this.todos = [...this.todos, newTodo];
-    // this.subject.next(this.todos);
-    // this.saveTodos(this.todos);
+    const maxIndexInTodos = this.todos.length ? this.todos.reduce((a, b) => (a > b.id ? a : b.id), 0) : 0;
+    newTodo.id = maxIndexInTodos + 1;
+    this.store.dispatch(new TodoAddedAction(newTodo));
   }
 
   clearTodos() {
-    // this.todos = [];
-    // this.subject.next(this.todos);
-    // this.saveTodos(this.todos);
+    this.store.dispatch(new TodosClearedAction());
   }
 
   private loadTodos(): Observable<Todo[]> {
@@ -54,10 +57,6 @@ export class TodosService {
         .delay(2000)
         .map(todos => this.todoToViewModel(todos));
     });
-  }
-
-  private saveTodos(todos: Todo[]) {
-    this.storageService.saveTodos(todos);
   }
 
   private todoToViewModel(todos: any[]): Todo[] {
